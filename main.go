@@ -2,20 +2,25 @@ package main
 
 import (
     "fmt"
+	"log"
 
     "github.com/gocql/gocql"
 )
 
 func main() {
-    // Connect to the Cassandra cluster
-    cluster := gocql.NewCluster("localhost")
-    cluster.Keyspace = "test"
-    session, err := cluster.CreateSession()
-    if err != nil {
-        panic(err)
-    }
-    defer session.Close()
 
+    // Connect to the Cassandra cluster
+	cluster := gocql.NewCluster("cassandra")
+    cluster.Consistency = gocql.Quorum
+	cluster.ProtoVersion = 4
+
+    session,err := cluster.CreateSession()
+	if err != nil{
+    	log.Println(err)
+		return
+    }
+
+    fmt.Println("Connection successfull...")
     // Create the keyspace and table
     if err := session.Query("CREATE KEYSPACE IF NOT EXISTS test WITH REPLICATION = {'class' : 'SimpleStrategy', 'replication_factor' : 1}").Exec(); err != nil {
         panic(err)
